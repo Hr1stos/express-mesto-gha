@@ -33,7 +33,7 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: ' Переданы некорректные данные карточки ' });
+        res.status(400).send({ message: 'Ошибка в id карты' });
         return;
       } if (err.message === 'NotValidId') {
         res.status(404).send({ message: 'Карточки нет в базе' });
@@ -54,8 +54,8 @@ const putLike = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: ' Переданы некорректные данные ' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Ошибка в id карты' });
         return;
       } if (err.message === 'NotValidId') {
         res.status(404).send({ message: 'Карточки нет в базе' });
@@ -76,8 +76,8 @@ const deleteLike = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: ' Переданы некорректные данные ' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Ошибка в id карты' });
         return;
       } if (err.message === 'NotValidId') {
         res.status(404).send({ message: 'Карточки нет в базе' });
