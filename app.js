@@ -1,12 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const router = require('./routes/index');
 
 const app = express();
 
-const port = 3000;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 }).then(() => {
   console.log('Подключен к БД');
@@ -20,10 +21,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(helmet());
+
 app.use(express.json());
 
 app.use(router);
 
-app.listen(port, () => {
-  console.log(`Приложение запущено, порт: ${port}`);
+app.listen(PORT, () => {
+  console.log(`Приложение запущено, порт: ${PORT}`);
 });

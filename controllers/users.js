@@ -12,15 +12,17 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   userModel.findById(req.params.id)
+    .orFail(new Error('NotValidId'))
     .then((user) => {
-      if (user === null) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
+        return;
+      } if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -35,6 +37,7 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ' Переданы некорректные данные пользователя' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -43,15 +46,17 @@ const createUser = (req, res) => {
 const updateUserById = (req, res) => {
   const { name, about } = req.body;
   userModel.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+    .orFail(new Error('NotValidId'))
     .then((user) => {
-      if (user === null) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
+        return;
+      } if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -60,15 +65,17 @@ const updateUserById = (req, res) => {
 const updateAvatarById = (req, res) => {
   const { avatar } = req.body;
   userModel.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+    .orFail(new Error('NotValidId'))
     .then((user) => {
-      if (user === null) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
       res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ' Переданы некорректные данные пользователя' });
+        return;
+      } if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });

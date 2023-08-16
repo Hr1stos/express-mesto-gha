@@ -19,6 +19,7 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ' Переданы некорректные данные карточки' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -26,15 +27,17 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   cardModel.findByIdAndRemove(req.params.cardId)
+    .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (card === null) {
-        res.status(404).send({ message: 'Карточки нет в базе' });
-      }
       res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: ' Переданы некорректные данные карточки ' });
+        return;
+      } if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Карточки нет в базе' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -46,15 +49,17 @@ const putLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (card === null) {
-        res.status(404).send({ message: 'Карточки нет в базе' });
-      }
       res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ' Переданы некорректные данные ' });
+        return;
+      } if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Карточки нет в базе' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -66,15 +71,17 @@ const deleteLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (card === null) {
-        res.status(404).send({ message: 'Карточки нет в базе' });
-      }
       res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ' Переданы некорректные данные ' });
+        return;
+      } if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Карточки нет в базе' });
+        return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
