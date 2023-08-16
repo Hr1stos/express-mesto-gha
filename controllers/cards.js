@@ -12,7 +12,7 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  cardModel.create({ name, link }, req.user._id)
+  cardModel.create({ name, link, owner: req.user._id })
     .then((card) => {
       res.status(201).send(card);
     })

@@ -45,7 +45,7 @@ const createUser = (req, res) => {
 
 const updateUserById = (req, res) => {
   const { name, about } = req.body;
-  userModel.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+  userModel.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(new Error('NotValidId'))
     .then((user) => {
       res.status(200).send(user);
@@ -64,7 +64,7 @@ const updateUserById = (req, res) => {
 
 const updateAvatarById = (req, res) => {
   const { avatar } = req.body;
-  userModel.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+  userModel.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(new Error('NotValidId'))
     .then((user) => {
       res.status(200).send(user);
