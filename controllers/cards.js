@@ -1,16 +1,14 @@
 const cardModel = require('../models/card');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   cardModel.find({})
     .then((cards) => {
       res.status(200).send(cards);
     })
-    .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
-    });
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   cardModel.create({ name, link, owner: req.user._id })
     .then((card) => {
@@ -21,11 +19,11 @@ const createCard = (req, res) => {
         res.status(400).send({ message: ' Переданы некорректные данные карточки' });
         return;
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   cardModel.findByIdAndRemove(req.params.cardId)
     .orFail(new Error('NotValidId'))
     .then((card) => {
@@ -39,11 +37,11 @@ const deleteCard = (req, res) => {
         res.status(404).send({ message: 'Карточки нет в базе' });
         return;
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
-const putLike = (req, res) => {
+const putLike = (req, res, next) => {
   cardModel.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -61,11 +59,11 @@ const putLike = (req, res) => {
         res.status(404).send({ message: 'Карточки нет в базе' });
         return;
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
-const deleteLike = (req, res) => {
+const deleteLike = (req, res, next) => {
   cardModel.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -83,7 +81,7 @@ const deleteLike = (req, res) => {
         res.status(404).send({ message: 'Карточки нет в базе' });
         return;
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
