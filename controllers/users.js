@@ -114,8 +114,9 @@ const login = (req, res, next) => {
             res.status(403).send({ message: 'Неверный логин или пароль' });
             return;
           }
-          const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-          res.cookie('jwt', token, { httpOnly: true }).status(200).send({ message: 'Авторизация прошла успешно' });
+          const payload = { _id: user._id };
+          const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+          res.cookie('token', token, { httpOnly: true }).status(200).send({ message: 'Авторизация прошла успешно' });
         });
     })
     .catch(next);

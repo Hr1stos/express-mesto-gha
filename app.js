@@ -4,7 +4,6 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const router = require('./routes/index');
-const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
 const handleError = require('./middlewares/handleError');
 const {
@@ -25,13 +24,12 @@ mongoose.connect(DB_URL, {
 app.use(helmet());
 app.use(express.json());
 
+app.use(router);
 app.post('/signup', validateCreateUser, createUser);
 app.post('/signin', validateLogin, login);
 app.use(cookieParser());
 app.use(errors());
-app.use(auth);
 app.use(handleError);
-app.use(router);
 
 app.listen(PORT, () => {
   console.log(`Приложение запущено, порт: ${PORT}`);
