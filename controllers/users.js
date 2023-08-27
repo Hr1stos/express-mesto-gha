@@ -104,14 +104,14 @@ const login = (req, res, next) => {
   userModel.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        res.status(403).send({ message: 'Неверный логин или пароль' });
+        res.status(401).send({ message: 'Неверный логин или пароль' });
         return;
       }
 
       bcrypt.compare(password, user.password)
         .then((isValid) => {
           if (!isValid) {
-            res.status(401).send({ message: 'Неверный логин или пароль' });
+            res.status(403).send({ message: 'Неверный логин или пароль' });
             return;
           }
           const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
