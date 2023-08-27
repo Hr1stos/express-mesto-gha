@@ -8,14 +8,14 @@ const validateCreateUser = celebrate({
     password: Joi.string().min(4).required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(20),
-    avatar: Joi.string().regex(urlRegExp),
+    avatar: Joi.string().pattern(urlRegExp),
   }),
 });
 
 const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required().min(4),
   }),
 });
 
@@ -34,14 +34,14 @@ const validateUpdateUserById = celebrate({
 
 const validateUpdateAvatarById = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(urlRegExp).required(),
+    avatar: Joi.string().pattern(urlRegExp).required(),
   }),
 });
 
 const validateCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required,
-    link: Joi.string().regex(urlRegExp).required(),
+    link: Joi.string().pattern(urlRegExp).required(),
   }),
 });
 

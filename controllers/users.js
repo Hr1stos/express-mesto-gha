@@ -44,6 +44,7 @@ const createUser = (req, res) => {
         about: user.about,
         name: user.name,
         avatar: user.avatar,
+        _id: user._id,
       });
     })
     .catch((err) => {
@@ -109,7 +110,6 @@ const login = (req, res, next) => {
 
       bcrypt.compare(password, user.password)
         .then((isValid) => {
-          console.log(isValid);
           if (!isValid) {
             res.status(401).send({ message: 'Неверный логин или пароль' });
             return;
