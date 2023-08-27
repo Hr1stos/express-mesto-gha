@@ -5,7 +5,7 @@ const urlRegExp = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 const validateCreateUser = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
-    password: Joi.string().min(8).required(),
+    password: Joi.string().min(4).required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(20),
     avatar: Joi.string().regex(urlRegExp),
