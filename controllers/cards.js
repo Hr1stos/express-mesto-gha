@@ -28,6 +28,7 @@ const deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
         res.status(403).send({ message: 'Вы не можете удалять карточки другого пользователя' });
+        return;
       }
       cardModel.findByIdAndRemove(req.params.cardId)
         .orFail(new Error('NotValidId'))
@@ -44,6 +45,13 @@ const deleteCard = (req, res, next) => {
           }
           next(err);
         });
+    })
+    .catch((err) => {
+      if (err.name === 'TypeError') {
+        res.status(404).send({ message: 'Карточки нет в базе' });
+        return;
+      }
+      next(err);
     });
 };
 
