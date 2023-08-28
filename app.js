@@ -4,12 +4,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const router = require('./routes/index');
-const { createUser, login } = require('./controllers/users');
 const handleError = require('./middlewares/handleError');
-const {
-  validateLogin,
-  validateCreateUser,
-} = require('./middlewares/requestValidation');
 
 const app = express();
 
@@ -25,8 +20,6 @@ app.use(helmet());
 app.use(express.json());
 
 app.use(router);
-app.post('/signup', validateCreateUser, createUser);
-app.post('/signin', validateLogin, login);
 app.use(cookieParser());
 app.use(errors());
 app.use(handleError);

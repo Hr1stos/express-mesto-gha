@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
 
-const JWT_SECRET = 'most-secret-key';
+const { JWT_SECRET = 'most-secret-key' } = process.env;
 
 const getUsers = (req, res, next) => {
   userModel.find({})
