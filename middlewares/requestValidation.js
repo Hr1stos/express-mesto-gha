@@ -21,14 +21,14 @@ const validateLogin = celebrate({
 
 const validateGetUserById = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().hex().length(24).required(),
+    id: Joi.string().hex().length(24).required(),
   }),
 });
 
 const validateUpdateUserById = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(20),
+    name: Joi.string().required().min(2).max(20),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
@@ -40,7 +40,7 @@ const validateUpdateAvatarById = celebrate({
 
 const validateCreateCard = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required,
+    name: Joi.string().min(2).max(30).required(),
     link: Joi.string().pattern(urlRegExp).required(),
   }),
 });

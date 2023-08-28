@@ -1,13 +1,14 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/user');
+const { userData } = require('../utils/userData');
 
-const { JWT_SECRET = 'most-secret-key' } = process.env;
+const JWT_SECRET = 'most-secret-key';
 
 const getUsers = (req, res, next) => {
   userModel.find({})
     .then((users) => {
-      res.status(200).send(users);
+      res.status(200).send({ data: users.map((user) => userData(user)) });
     })
     .catch(next);
 };
@@ -16,7 +17,7 @@ const getUserById = (req, res, next) => {
   userModel.findById(req.params.id)
     .orFail(new Error('NotValidId'))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ data: userData(user) });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -39,13 +40,7 @@ const createUser = (req, res) => {
       name, about, avatar, email, password: hash,
     }))
     .then((user) => {
-      res.status(201).send({
-        email: user.email,
-        about: user.about,
-        name: user.name,
-        avatar: user.avatar,
-        _id: user._id,
-      });
+      res.status(201).send({ data: userData(user) });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -62,7 +57,7 @@ const updateUserById = (req, res, next) => {
   userModel.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(new Error('NotValidId'))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ data: userData(user) });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -81,7 +76,7 @@ const updateAvatarById = (req, res, next) => {
   userModel.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(new Error('NotValidId'))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ data: userData(user) });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -122,6 +117,16 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const getCurrentUser = (req, res, next) => {
+  userModel.findById(req.user._id)
+    .then((user) => {
+      if (user) {
+        res.status(200).send({ data: userData(user) });
+      }
+    })
+    .catch(next);
+};
+
 module.exports = {
   getUsers,
   getUserById,
@@ -129,4 +134,5 @@ module.exports = {
   updateUserById,
   updateAvatarById,
   login,
+  getCurrentUser,
 };

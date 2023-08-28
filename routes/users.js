@@ -5,6 +5,7 @@ const {
   getUserById,
   updateUserById,
   updateAvatarById,
+  getCurrentUser,
 } = require('../controllers/users');
 
 const {
@@ -14,6 +15,7 @@ const {
 } = require('../middlewares/requestValidation');
 
 router.get('/users', getUsers);
+router.get('/me', getCurrentUser);
 router.get('/users/:id', validateGetUserById, getUserById);
 router.patch('/users/me', validateUpdateUserById, updateUserById);
 router.patch('/users/me/avatar', validateUpdateAvatarById, updateAvatarById);
