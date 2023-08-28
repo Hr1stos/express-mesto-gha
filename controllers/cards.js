@@ -24,20 +24,26 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  cardModel.findByIdAndRemove(req.params.cardId)
-    .orFail(new Error('NotValidId'))
+  cardModel.findById(req.params.cardId)
     .then((card) => {
-      res.status(200).send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Ошибка в id карты' });
-        return;
-      } if (err.message === 'NotValidId') {
-        res.status(404).send({ message: 'Карточки нет в базе' });
-        return;
+      if (!card.owner.equals(req.user._id)) {
+        res.status(403).send({ message: 'Вы не можете удалять карточки другого пользователя' });
       }
-      next(err);
+      cardModel.findByIdAndRemove(req.params.cardId)
+        .orFail(new Error('NotValidId'))
+        .then(() => {
+          res.status(200).send(card);
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            res.status(400).send({ message: 'Ошибка в id карты' });
+            return;
+          } if (err.message === 'NotValidId') {
+            res.status(404).send({ message: 'Карточки нет в базе' });
+            return;
+          }
+          next(err);
+        });
     });
 };
 
