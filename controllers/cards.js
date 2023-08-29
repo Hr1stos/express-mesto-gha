@@ -1,4 +1,8 @@
+const mongoose = require('mongoose');
 const cardModel = require('../models/card');
+const { BadRequestError } = require('../errors/badRequestError'); // 400
+const { ForbiddenError } = require('../errors/forbiddenError'); // 403
+const { NotFoundError } = require('../errors/notFoundError'); // 404
 
 const getCards = (req, res, next) => {
   cardModel.find({})
@@ -15,8 +19,8 @@ const createCard = (req, res, next) => {
       res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: ' Переданы некорректные данные карточки' });
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError('Переданы некорректные данные карточки'));
         return;
       }
       next(err);
@@ -25,30 +29,31 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   cardModel.findById(req.params.cardId)
+    .orFail()
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        res.status(403).send({ message: 'Вы не можете удалять карточки другого пользователя' });
+        next(new ForbiddenError('Вы не можете удалять карточки другого пользователя'));
         return;
       }
-      cardModel.findByIdAndRemove(req.params.cardId)
-        .orFail(new Error('NotValidId'))
+      cardModel.deleteOne(card)
+        .orFail()
         .then(() => {
           res.status(200).send(card);
         })
         .catch((err) => {
-          if (err.name === 'CastError') {
-            res.status(400).send({ message: 'Ошибка в id карты' });
+          if (err instanceof mongoose.Error.CastError) {
+            next(new BadRequestError('Ошибка в id карты'));
             return;
-          } if (err.message === 'NotValidId') {
-            res.status(404).send({ message: 'Карточки нет в базе' });
+          } if (err instanceof mongoose.Error.DocumentNotFoundError) {
+            next(new NotFoundError('Карточки нет в базе'));
             return;
           }
           next(err);
         });
     })
     .catch((err) => {
-      if (err.name === 'TypeError') {
-        res.status(404).send({ message: 'Карточки нет в базе' });
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError('Карточки нет в базе'));
         return;
       }
       next(err);
@@ -61,16 +66,16 @@ const putLike = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NotValidId'))
+    .orFail()
     .then((card) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Ошибка в id карты' });
+      if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError('Ошибка в id карты'));
         return;
-      } if (err.message === 'NotValidId') {
-        res.status(404).send({ message: 'Карточки нет в базе' });
+      } if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError('Карточки нет в базе'));
         return;
       }
       next(err);
@@ -83,16 +88,16 @@ const deleteLike = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NotValidId'))
+    .orFail()
     .then((card) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Ошибка в id карты' });
+      if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError('Ошибка в id карты'));
         return;
-      } if (err.message === 'NotValidId') {
-        res.status(404).send({ message: 'Карточки нет в базе' });
+      } if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError('Карточки нет в базе'));
         return;
       }
       next(err);
