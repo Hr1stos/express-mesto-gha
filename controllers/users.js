@@ -107,15 +107,22 @@ const login = (req, res, next) => {
     .orFail()
     .then((user) => {
       bcrypt.compare(password, user.password)
-        .orFail()
-        .then(() => {
+        .then((isValid) => {
+          if (!isValid) {
+            next(new UnauthorizedError('Неверный логин или пароль'));
+            return;
+          }
           const payload = { _id: user._id };
           const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
           res.cookie('token', token, { httpOnly: true }).status(200).send({ message: 'Авторизация прошла успешно' });
         });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Неверный логин или пароль 401'));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new UnauthorizedError('Неверный логин или пароль'));
+        return;
+      }
+      next(err);
     });
 };
 
