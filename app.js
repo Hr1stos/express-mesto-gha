@@ -19,8 +19,8 @@ mongoose.connect(DB_URL, {
 app.use(helmet());
 app.use(express.json());
 
-app.use(router);
 app.use(cookieParser());
+app.use(router);
 app.use(errors());
 app.use(handleError);
 
